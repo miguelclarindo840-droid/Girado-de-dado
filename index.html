@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dado Virtual D6</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: #f0f4f8;
+      color: #1e293b;
+      padding: 20px;
+    }
+
+    .app-container {
+      background: #ffffff;
+      padding: 40px 32px;
+      border-radius: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .resultado-texto {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin-bottom: 32px;
+      height: 24px;
+    }
+
+    /* Estilo do Dado */
+    .dado {
+      width: 120px;
+      height: 120px;
+      background-color: #ffffff;
+      border: 3px solid #cbd5e1;
+      border-radius: 20px;
+      margin: 0 auto 36px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), inset 0 -4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .dado.girando {
+      animation: girarDado 0.5s ease-in-out;
+    }
+
+    @keyframes girarDado {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    /* Pintas do dado */
+    .pinta {
+      width: 20px;
+      height: 20px;
+      background-color: #1e293b;
+      border-radius: 50%;
+      align-self: center;
+      justify-self: center;
+    }
+
+    .pinta.vermelha {
+      background-color: #ef4444; /* Destaque clássico no 1 */
+    }
+
+    /* Botão */
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #2563eb;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    button:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <h1>Jogar Dado</h1>
+    <p class="resultado-texto" id="textoResultado">Toque no botão para girar</p>
+
+    <div class="dado" id="dado"></div>
+
+    <button id="btnGirar" onclick="girarDado()">Girar Dado</button>
+  </div>
+
+  <script>
+    // Mapeamento das posições das pintas em uma grade 3x3 (índices de 1 a 9)
+    const faces = {
+      1: [5],
+      2: [1, 9],
+      3: [1, 5, 9],
+      4: [1, 3, 7, 9],
+      5: [1, 3, 5, 7, 9],
+      6: [1, 3, 4, 6, 7, 9]
+    };
+
+    const elementoDado = document.getElementById('dado');
+    const textoResultado = document.getElementById('textoResultado');
+    const btnGirar = document.getElementById('btnGirar');
+
+    function desenharFace(numero) {
+      elementoDado.innerHTML = '';
+      const posicoes = faces[numero];
+
+      for (let i = 1; i <= 9; i++) {
+        const celula = document.createElement('div');
+        if (posicoes.includes(i)) {
+          celula.classList.add('pinta');
+          if (numero === 1) celula.classList.add('vermelha');
+        }
+        elementoDado.appendChild(celula);
+      }
+    }
+
+    function girarDado() {
+      btnGirar.disabled = true;
+      textoResultado.textContent = 'Girando...';
+      elementoDado.classList.add('girando');
+
+      // Troca os números rapidamente durante a animação
+      const intervalo = setInterval(() => {
+        const faceTemporaria = Math.floor(Math.random() * 6) + 1;
+        desenharFace(faceTemporaria);
+      }, 80);
+
+      // Para a animação e define o resultado final
+      setTimeout(() => {
+        clearInterval(intervalo);
+        elementoDado.classList.remove('girando');
+
+        const resultadoFinal = Math.floor(Math.random() * 6) + 1;
+        desenharFace(resultadoFinal);
+
+        textoResultado.textContent = `Resultado: ${resultadoFinal}`;
+        btnGirar.disabled = false;
+      }, 500);
+    }
+
+    // Inicia mostrando o lado 6
+    desenharFace(6);
+  </script>
+
+</body>
+</html>
